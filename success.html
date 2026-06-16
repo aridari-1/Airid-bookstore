@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Your book is ready — Airid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0C0C0F;
+  --ink-mid:#18181F;
+  --ink-lt:#24242E;
+  --cream:#F2EDE4;
+  --cream-dk:#C8C2B0;
+  --gold:#C9960A;
+  --gold-lt:#E0B040;
+  --muted:#6B6B80;
+  --green:#27AE60;
+  --accent:#C9960A;
+}
+html{min-height:100vh}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--ink);
+  color:var(--cream);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Particle canvas ── */
+#canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── Main card ── */
+.card{
+  position:relative;z-index:1;
+  background:var(--ink-mid);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:16px;
+  padding:3rem 3rem 2.5rem;
+  max-width:520px;width:100%;
+  text-align:center;
+  animation:rise .6s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+
+/* ── Success badge ── */
+.success-badge{
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(39,174,96,.1);
+  border:1.5px solid rgba(39,174,96,.3);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.5rem;
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(39,174,96,.2)}50%{box-shadow:0 0 0 12px rgba(39,174,96,0)}}
+.success-badge svg{width:28px;height:28px;stroke:var(--green);stroke-width:2.5}
+
+/* ── Typography ── */
+.greeting{
+  font-size:.78rem;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;
+}
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.2rem;font-weight:700;
+  color:var(--cream);line-height:1.1;margin-bottom:.4rem;
+}
+.subtitle{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:1rem;color:var(--muted);
+  margin-bottom:2rem;
+}
+
+/* ── Book preview card ── */
+.book-preview{
+  background:var(--ink-lt);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:10px;
+  padding:1.4rem;
+  margin-bottom:2rem;
+  display:flex;gap:1.2rem;align-items:center;
+  text-align:left;
+}
+.book-thumb{
+  width:54px;height:76px;border-radius:3px;
+  flex-shrink:0;overflow:hidden;
+}
+.book-thumb svg{width:100%;height:100%}
+.book-info h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.05rem;font-weight:700;color:var(--cream);
+  margin-bottom:.25rem;line-height:1.3;
+}
+.book-info .genre-tag{
+  display:inline-block;font-size:.65rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:.2rem .55rem;border-radius:2px;margin-bottom:.4rem;
+}
+.book-info p{font-size:.8rem;color:var(--muted);line-height:1.5}
+.book-info .watermark-note{
+  display:flex;align-items:center;gap:.35rem;
+  font-size:.72rem;color:var(--green);margin-top:.5rem;
+}
+.book-info .watermark-note svg{width:11px;height:11px;stroke:var(--green)}
+
+/* ── Download button ── */
+.dl-btn{
+  display:flex;align-items:center;justify-content:center;gap:.7rem;
+  width:100%;
+  background:var(--gold);color:var(--ink);
+  font-size:1rem;font-weight:700;
+  padding:1.05rem 2rem;border-radius:6px;
+  border:none;cursor:pointer;text-decoration:none;
+  letter-spacing:.03em;
+  transition:background .2s,transform .15s,box-shadow .2s;
+  margin-bottom:.9rem;
+}
+.dl-btn:hover{
+  background:var(--gold-lt);transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(201,150,10,.25);
+}
+.dl-btn:active{transform:translateY(0)}
+.dl-btn svg{width:20px;height:20px}
+
+/* ── Info rows ── */
+.info-rows{
+  display:flex;flex-direction:column;gap:.5rem;
+  margin-bottom:1.8rem;
+}
+.info-row{
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  font-size:.78rem;color:var(--muted);
+}
+.info-row svg{width:13px;height:13px;opacity:.7}
+.info-row strong{color:var(--cream-dk)}
+
+/* ── Expiry countdown ── */
+.expiry{
+  font-size:.78rem;color:var(--muted);
+  padding:.7rem 1rem;
+  background:rgba(201,150,10,.06);
+  border:1px solid rgba(201,150,10,.12);
+  border-radius:6px;
+  margin-bottom:1.8rem;
+}
+.expiry strong{color:var(--gold)}
+#countdown{font-weight:600;color:var(--gold)}
+
+/* ── Next steps ── */
+.next{
+  border-top:1px solid rgba(255,255,255,.05);
+  padding-top:1.5rem;
+}
+.next p{font-size:.84rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.back-link{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.82rem;color:var(--gold);text-decoration:none;
+  transition:opacity .2s;
+}
+.back-link:hover{opacity:.75}
+.back-link svg{width:14px;height:14px}
+
+/* ── Responsive ── */
+@media(max-width:520px){
+  .card{padding:2rem 1.5rem}
+  h1{font-size:1.8rem}
+  .book-preview{flex-direction:column;text-align:center}
+  .book-info .watermark-note{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas" aria-hidden="true"></canvas>
+
+<main class="card" role="main">
+
+  <div class="success-badge" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+
+  <p class="greeting" id="greeting-name">Thank you for your purchase</p>
+  <h1>Your book is ready.</h1>
+  <p class="subtitle">A personal copy, waiting for you below.</p>
+
+  <!-- Book preview -->
+  <div class="book-preview" id="book-preview">
+    <div class="book-thumb" id="book-thumb"></div>
+    <div class="book-info">
+      <div class="genre-tag" id="genre-tag">—</div>
+      <h2 id="book-title">Loading…</h2>
+      <p>PDF ebook · by Airid · DRM-free</p>
+      <div class="watermark-note" role="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        This copy is watermarked to your account
+      </div>
+    </div>
+  </div>
+
+  <!-- Download button -->
+  <a class="dl-btn" id="dl-btn" href="#" role="button" aria-label="Download your ebook">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    Download your ebook — PDF
+  </a>
+
+  <!-- Info rows -->
+  <div class="info-rows">
+    <div class="info-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>DRM-free PDF · works on any device or app</span>
+    </div>
+    <div class="info-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Download up to <strong>3 times</strong> on your devices</span>
+    </div>
+    <div class="info-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <span>Secure Stripe payment · no card data stored</span>
+    </div>
+  </div>
+
+  <!-- Expiry countdown -->
+  <div class="expiry" role="timer" aria-live="polite">
+    This link expires in <span id="countdown">23:59:59</span> — download now and save to your device.
+  </div>
+
+  <!-- Next steps -->
+  <div class="next">
+    <p>Download the PDF and open it with any PDF reader — Adobe Acrobat, Apple Books, Google Drive, or your e-reader. It's yours to keep forever.</p>
+    <a href="/" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      Browse more books by Airid
+    </a>
+  </div>
+
+</main>
+
+<script>
+(function () {
+  // ── Parse URL params ───────────────────────────────────────────────────
+  var params = new URLSearchParams(window.location.search);
+  var bookTitle = params.get("book") || "Your Airid Ebook";
+  var genre     = params.get("genre") || "Fiction";
+  var accentHex = params.get("color") || "#C9960A";
+  var dlUrl     = params.get("dl") || "#";
+  var buyerName = params.get("name") || "";
+
+  // Sanitize — strip HTML from URL params to prevent XSS
+  function sanitize(str) {
+    var d = document.createElement("div");
+    d.appendChild(document.createTextNode(str));
+    return d.innerHTML;
+  }
+
+  bookTitle = sanitize(decodeURIComponent(bookTitle));
+  genre     = sanitize(decodeURIComponent(genre));
+  buyerName = sanitize(decodeURIComponent(buyerName));
+  // dlUrl comes from our own server so is trusted, but still validate
+  dlUrl = decodeURIComponent(dlUrl);
+  if (!dlUrl.startsWith("https://") && !dlUrl.startsWith("/")) {
+    dlUrl = "/";
+  }
+
+  // ── Populate UI ────────────────────────────────────────────────────────
+  document.getElementById("book-title").textContent = bookTitle;
+  document.getElementById("genre-tag").textContent = genre;
+  document.getElementById("genre-tag").style.background = accentHex + "18";
+  document.getElementById("genre-tag").style.color = accentHex;
+  document.getElementById("genre-tag").style.border = "1px solid " + accentHex + "40";
+  document.getElementById("dl-btn").href = dlUrl;
+
+  if (buyerName) {
+    document.getElementById("greeting-name").textContent =
+      "Thank you, " + buyerName.split(" ")[0] + ".";
+  }
+
+  // ── Book thumb SVG by genre ────────────────────────────────────────────
+  var thumbSVGs = {
+    "Mystery Thriller": '<rect width="54" height="76" fill="#0D0D1A"/><line x1="27" y1="46" x2="27" y2="20" stroke="#5A5A8C" stroke-width="0.9"/><circle cx="27" cy="47" r="3" fill="#C0392B"/><line x1="15" y1="56" x2="27" y2="66" stroke="#3A3A5C" stroke-width="0.7"/><line x1="39" y1="56" x2="27" y2="66" stroke="#3A3A5C" stroke-width="0.7"/><g fill="none" stroke="#C0392B" stroke-width="0.7"><path d="M21,19 Q17,11 21,3"/><path d="M33,19 Q37,11 33,3"/></g><g fill="#080814"><rect x="0" y="64" width="16" height="12"/><rect x="38" y="62" width="16" height="14"/></g><text x="27" y="73" text-anchor="middle" fill="#888" font-family="Helvetica" font-size="4" letter-spacing="1">AIRID</text>',
+    "Dark Fantasy": '<rect width="54" height="76" fill="#0B0B1F"/><rect x="3" y="3" width="48" height="70" fill="none" stroke="#C9960A" stroke-width="0.5"/><circle cx="27" cy="36" r="16" fill="none" stroke="#C9960A" stroke-width="0.5"/><ellipse cx="27" cy="36" rx="9" ry="5" fill="#8B1A1A" stroke="#C9960A" stroke-width="0.5"/><circle cx="27" cy="36" r="2.5" fill="#0B0B1F"/><circle cx="27" cy="36" r="1" fill="#C9960A"/><text x="27" y="73" text-anchor="middle" fill="#777" font-family="Helvetica" font-size="4" letter-spacing="1">AIRID</text>',
+    "Dark Romance": '<rect width="54" height="76" fill="#0A0A0A"/><line x1="0" y1="26" x2="54" y2="38" stroke="#CC2936" stroke-width="1.5"/><line x1="0" y1="24" x2="54" y2="36" stroke="#CC2936" stroke-width="0.5"/><text x="27" y="20" text-anchor="middle" fill="#F4F2EE" font-family="Helvetica" font-size="9" font-weight="bold">KILL</text><text x="27" y="28" text-anchor="middle" fill="#CC2936" font-family="Helvetica" font-size="9" font-weight="bold">SWITCH</text><text x="27" y="73" text-anchor="middle" fill="#666" font-family="Helvetica" font-size="4" letter-spacing="1">AIRID</text>',
+    "AI Thriller": '<rect width="54" height="76" fill="#050810"/><circle cx="27" cy="36" r="18" fill="none" stroke="#00A8FF" stroke-width="0.4"/><line x1="27" y1="18" x2="27" y2="54" stroke="#00A8FF" stroke-width="0.5"/><ellipse cx="19" cy="33" rx="5" ry="3" fill="#0066CC"/><ellipse cx="35" cy="33" rx="5" ry="3" fill="#0066CC"/><circle cx="35" cy="33" r="1.5" fill="#050810"/><circle cx="35" cy="33" r="0.7" fill="#00A8FF"/><text x="27" y="16" text-anchor="middle" fill="#EEF2F7" font-family="Helvetica" font-size="5" font-weight="bold">MIRROR</text><text x="27" y="73" text-anchor="middle" fill="#6677AA" font-family="Helvetica" font-size="4" letter-spacing="1">AIRID</text>',
+  };
+
+  var thumbSvg = thumbSVGs[genre] || thumbSVGs["Mystery Thriller"];
+  var thumbEl = document.getElementById("book-thumb");
+  thumbEl.innerHTML = '<svg viewBox="0 0 54 76" xmlns="http://www.w3.org/2000/svg">' + thumbSvg + "</svg>";
+
+  // ── Countdown timer — 24 hours ─────────────────────────────────────────
+  var expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+
+  function updateCountdown() {
+    var remaining = Math.max(0, expiresAt - Date.now());
+    var h = Math.floor(remaining / 3600000);
+    var m = Math.floor((remaining % 3600000) / 60000);
+    var s = Math.floor((remaining % 60000) / 1000);
+    document.getElementById("countdown").textContent =
+      String(h).padStart(2, "0") + ":" +
+      String(m).padStart(2, "0") + ":" +
+      String(s).padStart(2, "0");
+    if (remaining > 0) setTimeout(updateCountdown, 1000);
+    else {
+      document.getElementById("countdown").textContent = "EXPIRED";
+      var btn = document.getElementById("dl-btn");
+      btn.style.opacity = "0.4";
+      btn.style.cursor = "not-allowed";
+      btn.removeAttribute("href");
+    }
+  }
+  updateCountdown();
+
+  // ── Particle background ────────────────────────────────────────────────
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+  var W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  for (var i = 0; i < 40; i++) {
+    particles.push({
+      x: Math.random() * 1400, y: Math.random() * 900,
+      vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2,
+      r: Math.random() * 1.2 + 0.3, a: Math.random() * 0.3 + 0.05
+    });
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(function (p) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(201,150,10," + p.a + ")";
+      ctx.fill();
+    });
+    requestAnimationFrame(drawParticles);
+  }
+  drawParticles();
+})();
+</script>
+
+</body>
+</html>

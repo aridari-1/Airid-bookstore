@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta name="description" content="AIRID — Four worlds. Mystery. Dark Fantasy. Dark Romance. AI Thriller. Official bookstore. Instant PDF download.">
+<meta property="og:title" content="AIRID — Official Bookstore">
+<meta property="og:description" content="Four books by Airid. Mystery · Dark Fantasy · Dark Romance · AI Thriller. $6.99 each. Instant download.">
+<meta property="og:type" content="website">
+<title>AIRID — Official Bookstore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/" defer></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0C0C0F;--ink-mid:#18181F;--ink-lt:#24242E;
+  --cream:#F2EDE4;--cream-dk:#C8C2B0;--muted:#6B6B80;
+  --gold:#C9960A;--gold-lt:#E0B040;--scarlet:#CC2936;
+  --electric:#00A8FF;--border:rgba(255,255,255,.05);
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--ink);color:var(--cream);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* SEC BAR */
+.sec-bar{background:#070B14;border-bottom:1px solid rgba(0,168,255,.1);padding:.3rem 4vw;display:flex;align-items:center;justify-content:center;gap:.6rem;font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,168,255,.5)}
+.sec-bar svg{width:10px;height:10px;stroke:rgba(0,168,255,.5);fill:none}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content:space-between;align-items:center;padding:1rem 6vw;background:rgba(12,12,15,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--cream);text-decoration:none;letter-spacing:.1em}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{font-size:.78rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--cream)}
+.nav-cta{background:var(--gold)!important;color:var(--ink)!important;padding:.5rem 1.4rem;border-radius:3px;font-weight:600!important;transition:background .2s,transform .15s!important}
+.nav-cta:hover{background:var(--gold-lt)!important;transform:translateY(-1px)!important}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:9rem 6vw 5rem;position:relative;overflow:hidden}
+#hero-canvas{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-inner{position:relative;z-index:2;max-width:1100px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.eyebrow{font-size:.68rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:.7rem}
+.eyebrow::before{content:'';width:22px;height:1px;background:var(--gold)}
+h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,6.5vw,5.2rem);font-weight:700;line-height:1.02;color:var(--cream);margin-bottom:.7rem}
+h1 em{font-style:italic;color:var(--gold)}
+.hero-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:var(--muted);margin-bottom:1.6rem}
+.hero-desc{font-size:.97rem;color:var(--cream-dk);max-width:420px;line-height:1.8;margin-bottom:2.4rem}
+.hero-stats{display:flex;gap:2.5rem;margin-bottom:2.8rem}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--cream);line-height:1;display:block}
+.stat-lbl{font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem;display:block}
+.btn-g{display:inline-flex;align-items:center;gap:.6rem;background:var(--gold);color:var(--ink);font-size:.9rem;font-weight:700;padding:.9rem 2rem;border-radius:3px;border:none;cursor:pointer;letter-spacing:.04em;text-decoration:none;transition:background .2s,transform .15s,box-shadow .2s}
+.btn-g:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,150,10,.25)}
+.btn-o{display:inline-flex;align-items:center;gap:.6rem;background:transparent;color:var(--cream);font-size:.9rem;font-weight:500;padding:.9rem 2rem;border-radius:3px;border:1px solid rgba(242,237,228,.13);cursor:pointer;letter-spacing:.04em;text-decoration:none;transition:border-color .2s,background .2s}
+.btn-o:hover{border-color:rgba(242,237,228,.3);background:rgba(242,237,228,.04)}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+
+/* HERO BOOK STACK */
+.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;height:440px}
+.books-stack{position:relative;width:290px;height:410px}
+.sbook{position:absolute;width:190px;height:270px;border-radius:3px 6px 6px 3px;box-shadow:0 20px 60px rgba(0,0,0,.75);transition:transform .4s var(--ease),box-shadow .4s;cursor:pointer}
+.sbook:nth-child(1){left:0;top:70px;transform:rotate(-8deg);z-index:1}
+.sbook:nth-child(2){left:30px;top:48px;transform:rotate(-3deg);z-index:2}
+.sbook:nth-child(3){left:60px;top:26px;transform:rotate(2deg);z-index:3}
+.sbook:nth-child(4){left:90px;top:4px;transform:rotate(6deg);z-index:4;animation:bookfloat 6s ease-in-out infinite}
+.sbook:hover{transform:translateY(-18px) rotate(0)!important;z-index:10!important;box-shadow:0 32px 70px rgba(0,0,0,.8)!important}
+@keyframes bookfloat{0%,100%{transform:translateY(0) rotate(6deg)}50%{transform:translateY(-12px) rotate(6deg)}}
+
+/* SECTIONS */
+.section{padding:6rem 6vw}
+.inner{max-width:1100px;margin:0 auto}
+.sec-label{font-size:.68rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem}
+.sec-label::before{content:'';width:18px;height:1px;background:var(--gold)}
+h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4.5vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1rem}
+.divider{height:1px;margin:0 6vw;background:linear-gradient(90deg,transparent,rgba(201,150,10,.18),transparent)}
+
+/* BOOKS GRID */
+.books-section{background:var(--ink-mid)}
+.bk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:1.8rem;margin-top:3rem}
+.bk-card{background:var(--ink-lt);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:transform .3s var(--ease),border-color .3s,box-shadow .3s;cursor:pointer;display:flex;flex-direction:column}
+.bk-card:hover{transform:translateY(-6px);border-color:rgba(201,150,10,.22);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.bk-cover{height:238px;position:relative;overflow:hidden;flex-shrink:0}
+.bk-cover svg{width:100%;height:100%}
+.bk-badge{position:absolute;top:.75rem;left:.75rem;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .65rem;border-radius:2px}
+.bk-body{padding:1.35rem;display:flex;flex-direction:column;flex:1}
+.bk-num{font-size:.62rem;font-weight:600;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:.35rem}
+.bk-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--cream);line-height:1.2;margin-bottom:.55rem}
+.bk-desc{font-size:.83rem;color:var(--muted);line-height:1.65;flex:1;margin-bottom:1.1rem}
+.bk-foot{display:flex;align-items:center;justify-content:space-between;padding-top:.9rem;border-top:1px solid var(--border)}
+.bk-price{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold)}
+.bk-btn{background:var(--gold);color:var(--ink);font-size:.75rem;font-weight:700;letter-spacing:.06em;padding:.48rem 1rem;border-radius:3px;border:none;cursor:pointer;transition:background .2s,transform .15s;text-transform:uppercase}
+.bk-btn:hover{background:var(--gold-lt);transform:translateY(-1px)}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:160px 1fr;gap:4rem;align-items:start;margin-top:3rem}
+.about-initial{width:160px;height:160px;background:var(--ink-lt);border:1px solid rgba(201,150,10,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:5.5rem;font-weight:700;color:var(--gold)}
+.about-text p{font-size:1.02rem;color:var(--cream-dk);line-height:1.85;margin-bottom:1.1rem}
+.about-pull{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.45rem;color:var(--cream);line-height:1.5;border-left:2px solid var(--gold);padding-left:1.5rem;margin:2rem 0}
+
+/* TRUST */
+.trust-section{background:var(--ink-mid);padding:5rem 6vw}
+.trust-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:1.4rem;max-width:1100px;margin:2.5rem auto 0}
+.trust-card{background:var(--ink-lt);border:1px solid var(--border);border-radius:6px;padding:1.4rem}
+.trust-icon{width:34px;height:34px;background:rgba(0,168,255,.07);border-radius:5px;display:flex;align-items:center;justify-content:center;margin-bottom:.85rem}
+.trust-icon svg{width:17px;height:17px;stroke:var(--electric);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.trust-card h3{font-size:.88rem;font-weight:600;color:var(--cream);margin-bottom:.35rem}
+.trust-card p{font-size:.8rem;color:var(--muted);line-height:1.6}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
+.overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--ink-mid);border:1px solid rgba(255,255,255,.08);border-radius:14px;width:100%;max-width:450px;padding:2.2rem;transform:translateY(22px);transition:transform .3s var(--ease);position:relative;max-height:90vh;overflow-y:auto}
+.overlay.open .modal{transform:none}
+.modal-x{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.06);border:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:1rem;transition:background .2s,color .2s}
+.modal-x:hover{background:rgba(255,255,255,.12);color:var(--cream)}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:700;color:var(--cream);margin-bottom:1.4rem;padding-right:2rem}
+.modal-row{display:flex;gap:1rem;align-items:center;padding:1rem;background:var(--ink-lt);border-radius:6px;margin-bottom:1.4rem}
+.modal-thumb{width:46px;height:64px;border-radius:3px;flex-shrink:0;overflow:hidden}
+.modal-thumb svg{width:100%;height:100%}
+.modal-meta h4{font-family:'Cormorant Garamond',serif;font-size:.98rem;font-weight:700;color:var(--cream);margin-bottom:.2rem}
+.modal-meta p{font-size:.78rem;color:var(--muted)}
+.modal-meta .ok{color:#27AE60;margin-top:.3rem}
+.price-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.4rem;padding-bottom:1.4rem;border-bottom:1px solid var(--border)}
+.price-row span{font-size:.88rem;color:var(--muted)}
+.price-val{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:700;color:var(--gold)}
+.pay-btn{width:100%;background:var(--gold);color:var(--ink);font-size:.95rem;font-weight:700;padding:1rem;border-radius:5px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.6rem;letter-spacing:.03em;transition:background .2s,transform .15s;margin-bottom:.9rem}
+.pay-btn:hover{background:var(--gold-lt);transform:translateY(-1px)}
+.pay-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.pay-btn svg{width:18px;height:18px}
+.sec-note{display:flex;align-items:center;justify-content:center;gap:.45rem;font-size:.73rem;color:var(--muted)}
+.sec-note svg{width:12px;height:12px;stroke:var(--electric);fill:none;stroke-width:2;stroke-linecap:round}
+.setup-box{margin-top:1.1rem;padding:.85rem 1rem;background:rgba(201,150,10,.06);border:1px solid rgba(201,150,10,.18);border-radius:6px;font-size:.76rem;color:#B8A070;line-height:1.65}
+.setup-box strong{color:var(--gold)}
+.setup-box code{background:rgba(0,0,0,.3);padding:.1rem .35rem;border-radius:3px;font-size:.72rem;font-family:monospace}
+
+/* FOOTER */
+footer{background:#070710;padding:3rem 6vw 2rem;border-top:1px solid var(--border)}
+.ft-top{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;max-width:1100px;margin:0 auto 2.5rem}
+.ft-logo{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:700;color:var(--cream);letter-spacing:.1em;margin-bottom:.7rem}
+.ft-logo span{color:var(--gold)}
+.ft-tag{font-size:.85rem;color:var(--muted);line-height:1.7;max-width:280px}
+.ft-col h4{font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--cream-dk);margin-bottom:1.1rem}
+.ft-col a{display:block;font-size:.83rem;color:var(--muted);text-decoration:none;margin-bottom:.55rem;transition:color .2s}
+.ft-col a:hover{color:var(--cream)}
+.ft-bottom{max-width:1100px;margin:0 auto;padding-top:1.8rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.ft-bottom p{font-size:.76rem;color:var(--muted)}
+.ft-badges{display:flex;gap:.7rem}
+.badge{font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,168,255,.45);padding:.25rem .55rem;border:1px solid rgba(0,168,255,.12);border-radius:3px}
+
+/* TOAST */
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink-mid);border:1px solid rgba(39,174,96,.35);color:var(--cream);padding:.75rem 1.5rem;border-radius:6px;font-size:.86rem;z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
+.reveal.visible{opacity:1;transform:none}
+
+/* RESPONSIVE */
+@media(max-width:860px){
+  .hero-inner{grid-template-columns:1fr;gap:3rem}
+  .hero-visual{order:-1;height:290px}
+  .about-grid{grid-template-columns:1fr}
+  .about-initial{width:90px;height:90px;font-size:3rem}
+  .ft-top{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+}
+@media(max-width:580px){
+  .hero{padding-top:8rem}
+  .bk-grid{grid-template-columns:1fr}
+  .ft-top{grid-template-columns:1fr}
+  .ft-bottom{flex-direction:column;text-align:center}
+  .ft-badges{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="sec-bar" role="status">
+  <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  SSL Encrypted &nbsp;·&nbsp; Stripe Secured &nbsp;·&nbsp; Instant PDF Download
+</div>
+
+<nav role="navigation" aria-label="Main">
+  <a href="#" class="nav-logo">A<span>I</span>RID</a>
+  <div class="nav-links">
+    <a href="#books">Books</a>
+    <a href="#about">About</a>
+    <a href="#books" class="nav-cta">Shop</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" aria-label="Hero">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow">Complete Collection — 4 Books</div>
+      <h1>Stories that<br><em>don't let go</em></h1>
+      <p class="hero-sub">Mystery · Dark Fantasy · Dark Romance · AI Thriller</p>
+      <p class="hero-desc">Four worlds. Four obsessions. Each book a door into something you haven't read before — written to be read at midnight and remembered for years.</p>
+      <div class="hero-stats">
+        <div><span class="stat-num">4</span><span class="stat-lbl">Books</span></div>
+        <div><span class="stat-num">4</span><span class="stat-lbl">Genres</span></div>
+        <div><span class="stat-num">$6.99</span><span class="stat-lbl">Each</span></div>
+      </div>
+      <div class="hero-btns">
+        <a href="#books" class="btn-g">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          Browse all books
+        </a>
+        <a href="#about" class="btn-o">About Airid</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="books-stack">
+        <svg class="sbook" viewBox="0 0 190 270" onclick="openModal(0)"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0D0D1A"/><stop offset="100%" stop-color="#1E1640"/></linearGradient></defs><rect width="190" height="270" fill="url(#g1)"/><rect width="4" height="270" fill="#0A0A18"/><line x1="16" y1="84" x2="174" y2="84" stroke="#C0392B" stroke-width="1.5"/><text x="95" y="78" text-anchor="middle" fill="#F0EDE6" font-family="Georgia,serif" font-size="13" font-weight="bold">THE LAST</text><text x="95" y="97" text-anchor="middle" fill="#F0EDE6" font-family="Georgia,serif" font-size="13" font-weight="bold">FREQUENCY</text><text x="95" y="110" text-anchor="middle" fill="#E8A020" font-family="Helvetica" font-size="5" letter-spacing="3">TOME ONE</text><line x1="95" y1="158" x2="95" y2="118" stroke="#5A5A8C" stroke-width="1"/><circle cx="95" cy="160" r="4" fill="#C0392B"/><line x1="70" y1="156" x2="95" y2="198" stroke="#3A3A5C" stroke-width="0.8"/><line x1="120" y1="156" x2="95" y2="198" stroke="#3A3A5C" stroke-width="0.8"/><g fill="#080814"><rect x="0" y="208" width="32" height="62"/><rect x="158" y="212" width="32" height="58"/></g><text x="95" y="258" text-anchor="middle" fill="#888899" font-family="Helvetica" font-size="7" letter-spacing="2">AIRID</text></svg>
+        <svg class="sbook" viewBox="0 0 190 270" onclick="openModal(1)"><rect width="190" height="270" fill="#0B0B1F"/><rect width="4" height="270" fill="#07071A"/><rect x="12" y="10" width="166" height="250" fill="none" stroke="#C9960A" stroke-width="0.7"/><circle cx="95" cy="135" r="38" fill="none" stroke="#C9960A" stroke-width="0.6"/><circle cx="95" cy="135" r="28" fill="none" stroke="#C9960A" stroke-width="0.3"/><ellipse cx="95" cy="135" rx="18" ry="10" fill="#8B1A1A" stroke="#C9960A" stroke-width="0.7"/><circle cx="95" cy="135" r="5.5" fill="#0B0B1F"/><circle cx="95" cy="135" r="2.2" fill="#C9960A"/><text x="95" y="72" text-anchor="middle" fill="#EDE8DC" font-family="Georgia,serif" font-size="9" font-weight="bold">THE BLOOD OF</text><text x="95" y="83" text-anchor="middle" fill="#EDE8DC" font-family="Georgia,serif" font-size="9" font-weight="bold">FORGOTTEN GODS</text><text x="95" y="258" text-anchor="middle" fill="#777790" font-family="Helvetica" font-size="7" letter-spacing="2">AIRID</text></svg>
+        <svg class="sbook" viewBox="0 0 190 270" onclick="openModal(2)"><rect width="190" height="270" fill="#0A0A0A"/><rect width="4" height="270" fill="#050505"/><g stroke="#1C1C1C" stroke-width="0.35"><line x1="0" y1="30" x2="190" y2="30"/><line x1="0" y1="60" x2="190" y2="60"/><line x1="0" y1="90" x2="190" y2="90"/><line x1="0" y1="120" x2="190" y2="120"/><line x1="30" y1="0" x2="30" y2="270"/><line x1="60" y1="0" x2="60" y2="270"/><line x1="90" y1="0" x2="90" y2="270"/><line x1="120" y1="0" x2="120" y2="270"/><line x1="150" y1="0" x2="150" y2="270"/></g><line x1="0" y1="97" x2="190" y2="138" stroke="#CC2936" stroke-width="2.5"/><line x1="0" y1="94" x2="190" y2="135" stroke="#CC2936" stroke-width="0.8"/><circle cx="48" cy="107" r="3.5" fill="#CC2936" stroke="#0A0A0A" stroke-width="1"/><circle cx="95" cy="116" r="3.5" fill="#CC2936" stroke="#0A0A0A" stroke-width="1"/><circle cx="142" cy="127" r="3.5" fill="#CC2936" stroke="#0A0A0A" stroke-width="1"/><text x="95" y="75" text-anchor="middle" fill="#F4F2EE" font-family="Helvetica" font-size="22" font-weight="bold">KILL</text><text x="95" y="91" text-anchor="middle" fill="#CC2936" font-family="Helvetica" font-size="22" font-weight="bold">SWITCH</text><text x="95" y="258" text-anchor="middle" fill="#888" font-family="Helvetica" font-size="7" letter-spacing="2">AIRID</text></svg>
+        <svg class="sbook" viewBox="0 0 190 270" onclick="openModal(3)"><defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#050810"/><stop offset="100%" stop-color="#0D1528"/></linearGradient></defs><rect width="190" height="270" fill="url(#g4)"/><rect width="4" height="270" fill="#030508"/><circle cx="95" cy="130" r="45" fill="none" stroke="#00A8FF" stroke-width="0.4"/><circle cx="95" cy="130" r="36" fill="#080D1A"/><line x1="95" y1="85" x2="95" y2="175" stroke="#00A8FF" stroke-width="0.6"/><ellipse cx="73" cy="124" rx="9" ry="5.5" fill="#0066CC"/><ellipse cx="117" cy="124" rx="9" ry="5.5" fill="#0066CC"/><circle cx="73" cy="124" r="3" fill="#050810"/><circle cx="117" cy="124" r="3" fill="#050810"/><circle cx="117" cy="124" r="1.2" fill="#00A8FF"/><line x1="117" y1="121" x2="126" y2="121" stroke="#00A8FF" stroke-width="0.5"/><text x="95" y="65" text-anchor="middle" fill="#8899BB" font-family="Helvetica" font-size="6" letter-spacing="1">THE</text><text x="95" y="75" text-anchor="middle" fill="#EEF2F7" font-family="Helvetica" font-size="12" font-weight="bold">MIRROR</text><text x="95" y="87" text-anchor="middle" fill="#00A8FF" font-family="Helvetica" font-size="12" font-weight="bold">PROTOCOL</text><text x="95" y="258" text-anchor="middle" fill="#6677AA" font-family="Helvetica" font-size="7" letter-spacing="2">AIRID</text></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKS -->
+<section class="section books-section" id="books" aria-label="Book catalog">
+  <div class="inner">
+    <div class="sec-label">The Collection</div>
+    <h2>Four worlds to get lost in</h2>
+    <div class="bk-grid">
+
+      <article class="bk-card reveal" onclick="openModal(0)" role="button" tabindex="0" aria-label="The Last Frequency">
+        <div class="bk-cover" style="background:linear-gradient(150deg,#0D0D1A,#1E1640)">
+          <svg viewBox="0 0 240 238"><line x1="120" y1="172" x2="120" y2="68" stroke="#5A5A8C" stroke-width="1.2"/><line x1="120" y1="172" x2="88" y2="208" stroke="#3A3A5C" stroke-width="1"/><line x1="120" y1="172" x2="152" y2="208" stroke="#3A3A5C" stroke-width="1"/><line x1="102" y1="190" x2="138" y2="190" stroke="#3A3A5C" stroke-width="0.7"/><line x1="109" y1="181" x2="131" y2="181" stroke="#3A3A5C" stroke-width="0.6"/><g fill="none" stroke="#C0392B"><path d="M106,66 Q97,48 106,30" stroke-width="1" opacity=".9"/><path d="M96,70 Q84,46 96,22" stroke-width="0.75" opacity=".7"/><path d="M134,66 Q143,48 134,30" stroke-width="1" opacity=".9"/><path d="M144,70 Q156,46 144,22" stroke-width="0.75" opacity=".7"/></g><circle cx="120" cy="66" r="4.5" fill="#C0392B"/><circle cx="120" cy="66" r="8" fill="#C0392B" opacity="0.25"/><g fill="#080814" opacity="0.9"><rect x="0" y="212" width="42" height="26"/><rect x="198" y="208" width="42" height="30"/><rect x="46" y="218" width="26" height="20"/><rect x="168" y="216" width="30" height="22"/></g></svg>
+          <div class="bk-badge" style="background:rgba(192,57,43,.14);color:#E07060;border:1px solid rgba(192,57,43,.28)">Mystery Thriller</div>
+        </div>
+        <div class="bk-body">
+          <div class="bk-num">Book 01 — Tome One</div>
+          <div class="bk-title">The Last Frequency</div>
+          <div class="bk-desc">A radio tower goes silent. A threatening text arrives. Zara Okafor starts pulling a thread that runs all the way to her own family's darkest secret — and a name nobody in town says out loud.</div>
+          <div class="bk-foot"><span class="bk-price">$6.99</span><button class="bk-btn" onclick="event.stopPropagation();openModal(0)">Get it now</button></div>
+        </div>
+      </article>
+
+      <article class="bk-card reveal" onclick="openModal(1)" role="button" tabindex="0" aria-label="The Blood of Forgotten Gods">
+        <div class="bk-cover" style="background:#0B0B1F">
+          <svg viewBox="0 0 240 238"><rect width="240" height="238" fill="#0B0B1F"/><rect x="10" y="10" width="220" height="218" fill="none" stroke="#C9960A" stroke-width="0.6"/><circle cx="120" cy="118" r="62" fill="none" stroke="#C9960A" stroke-width="0.7"/><circle cx="120" cy="118" r="48" fill="#0B0B1F" stroke="#C9960A" stroke-width="0.35"/><g stroke="#C9960A" stroke-width="0.35"><line x1="120" y1="56" x2="120" y2="52"/><line x1="150" y1="66" x2="153" y2="63"/><line x1="167" y1="90" x2="171" y2="88"/><line x1="171" y1="118" x2="175" y2="118"/><line x1="167" y1="147" x2="171" y2="150"/><line x1="73" y1="66" x2="69" y2="63"/><line x1="73" y1="147" x2="69" y2="150"/><line x1="69" y1="118" x2="65" y2="118"/></g><ellipse cx="120" cy="118" rx="28" ry="15" fill="#8B1A1A" stroke="#C9960A" stroke-width="0.8"/><circle cx="120" cy="118" r="7.5" fill="#0B0B1F"/><circle cx="120" cy="118" r="3" fill="#C9960A"/><path d="M107,123 Q111,134 120,137 Q129,134 133,123" fill="none" stroke="#C9960A" stroke-width="0.5"/></svg>
+          <div class="bk-badge" style="background:rgba(139,26,26,.14);color:#C07060;border:1px solid rgba(139,26,26,.28)">Dark Fantasy</div>
+        </div>
+        <div class="bk-body">
+          <div class="bk-num">Book 02 — Book One</div>
+          <div class="bk-title">The Blood of Forgotten Gods</div>
+          <div class="bk-desc">Istanbul, 1893. Nura Kaya's hands bleed light in a dye workshop. A stranger hands her a card with an eye on it. What lives in the city's ancient foundations is waking up — and it knows her name.</div>
+          <div class="bk-foot"><span class="bk-price">$6.99</span><button class="bk-btn" onclick="event.stopPropagation();openModal(1)">Get it now</button></div>
+        </div>
+      </article>
+
+      <article class="bk-card reveal" onclick="openModal(2)" role="button" tabindex="0" aria-label="Kill Switch">
+        <div class="bk-cover" style="background:#0A0A0A">
+          <svg viewBox="0 0 240 238"><rect width="240" height="238" fill="#0A0A0A"/><g stroke="#1B1B1B" stroke-width="0.3"><line x1="0" y1="30" x2="240" y2="30"/><line x1="0" y1="60" x2="240" y2="60"/><line x1="0" y1="90" x2="240" y2="90"/><line x1="0" y1="120" x2="240" y2="120"/><line x1="0" y1="150" x2="240" y2="150"/><line x1="0" y1="180" x2="240" y2="180"/><line x1="30" y1="0" x2="30" y2="238"/><line x1="60" y1="0" x2="60" y2="238"/><line x1="90" y1="0" x2="90" y2="238"/><line x1="120" y1="0" x2="120" y2="238"/><line x1="150" y1="0" x2="150" y2="238"/><line x1="180" y1="0" x2="180" y2="238"/><line x1="210" y1="0" x2="210" y2="238"/></g><line x1="0" y1="95" x2="240" y2="143" stroke="#CC2936" stroke-width="2.5"/><line x1="0" y1="92" x2="240" y2="140" stroke="#CC2936" stroke-width="0.8"/><circle cx="60" cy="107" r="4" fill="#CC2936" stroke="#0A0A0A" stroke-width="1.5"/><circle cx="120" cy="119" r="4" fill="#CC2936" stroke="#0A0A0A" stroke-width="1.5"/><circle cx="180" cy="131" r="4" fill="#CC2936" stroke="#0A0A0A" stroke-width="1.5"/></svg>
+          <div class="bk-badge" style="background:rgba(204,41,54,.12);color:#E06070;border:1px solid rgba(204,41,54,.28)">Dark Romance</div>
+        </div>
+        <div class="bk-body">
+          <div class="bk-num">Book 03 — Book One</div>
+          <div class="bk-title">Kill Switch</div>
+          <div class="bk-desc">She wrote the ethics rules for the most dangerous technology in Silicon Valley. He built it — with a kill switch only he controls. Someone is trying to take it. And they absolutely should not want each other this much.</div>
+          <div class="bk-foot"><span class="bk-price">$6.99</span><button class="bk-btn" onclick="event.stopPropagation();openModal(2)">Get it now</button></div>
+        </div>
+      </article>
+
+      <article class="bk-card reveal" onclick="openModal(3)" role="button" tabindex="0" aria-label="The Mirror Protocol">
+        <div class="bk-cover" style="background:linear-gradient(150deg,#050810,#0D1528)">
+          <svg viewBox="0 0 240 238"><defs><linearGradient id="g4b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#050810"/><stop offset="100%" stop-color="#0D1528"/></linearGradient></defs><rect width="240" height="238" fill="url(#g4b)"/><g stroke="#00A8FF" stroke-width="0.3" opacity="0.45"><line x1="0" y1="40" x2="240" y2="40"/><line x1="0" y1="80" x2="240" y2="80"/><line x1="0" y1="120" x2="240" y2="120"/><line x1="0" y1="160" x2="240" y2="160"/><line x1="0" y1="200" x2="240" y2="200"/></g><circle cx="96" cy="118" r="52" fill="#1A1228" stroke="#00A8FF" stroke-width="0.3"/><rect x="120" y="66" width="26" height="104" fill="none" stroke="#00A8FF" stroke-width="0.3" opacity="0.45"/><g stroke="#00A8FF" stroke-width="0.25" opacity="0.4"><line x1="120" y1="76" x2="146" y2="76"/><line x1="120" y1="86" x2="146" y2="86"/><line x1="120" y1="96" x2="146" y2="96"/><line x1="120" y1="106" x2="146" y2="106"/><line x1="120" y1="116" x2="146" y2="116"/><line x1="120" y1="126" x2="146" y2="126"/><line x1="120" y1="136" x2="146" y2="136"/><line x1="120" y1="146" x2="146" y2="146"/></g><line x1="96" y1="66" x2="96" y2="170" stroke="#00A8FF" stroke-width="0.9"/><ellipse cx="75" cy="110" rx="13" ry="8" fill="#7B5EA7"/><circle cx="75" cy="110" r="4.5" fill="#2A1040"/><ellipse cx="117" cy="110" rx="13" ry="8" fill="#0066CC"/><circle cx="117" cy="110" r="4.5" fill="#050810"/><circle cx="117" cy="110" r="2" fill="#00A8FF"/><line x1="117" y1="107" x2="130" y2="107" stroke="#00A8FF" stroke-width="0.5"/></svg>
+          <div class="bk-badge" style="background:rgba(0,168,255,.09);color:#60A8D0;border:1px solid rgba(0,168,255,.22)">AI Thriller</div>
+        </div>
+        <div class="bk-body">
+          <div class="bk-num">Book 04 — Book One</div>
+          <div class="bk-title">The Mirror Protocol</div>
+          <div class="bk-desc">Tokyo, 2031. An AI reconstruction of her dead twin contacts her at 2 AM. She wrote the rules that say this is impossible. The Echo says: I know. But what Maya needed to tell you couldn't wait any longer.</div>
+          <div class="bk-foot"><span class="bk-price">$6.99</span><button class="bk-btn" onclick="event.stopPropagation();openModal(3)">Get it now</button></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section class="section" id="about" style="background:var(--ink)" aria-label="About Airid">
+  <div class="inner">
+    <div class="sec-label">The Author</div>
+    <div class="about-grid">
+      <div class="about-initial" aria-hidden="true">A</div>
+      <div class="about-text">
+        <h2>Airid</h2>
+        <div class="about-pull">"Every book starts with a question I can't stop thinking about."</div>
+        <p>Airid is the author of four debut novels spanning mystery thriller, supernatural dark fantasy, dark romance, and psychological science fiction. Each book is set in a different world, written in a different register, and built around a character who refuses to be reduced to a single idea.</p>
+        <p>The Last Frequency began with a silent radio tower. The Blood of Forgotten Gods began with what cities bury beneath themselves. Kill Switch began with a woman who reads every page of a contract before she signs it. The Mirror Protocol began with the question: what if grief technology worked perfectly — and that was the problem?</p>
+        <p>All four Book Ones are available now. All four series continue.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TRUST -->
+<section class="trust-section" id="trust" aria-label="Security">
+  <div class="inner" style="text-align:center">
+    <div class="sec-label" style="justify-content:center">Why buy direct</div>
+    <h2>Secure. Simple. Yours forever.</h2>
+  </div>
+  <div class="trust-grid">
+    <div class="trust-card reveal">
+      <div class="trust-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <h3>Stripe payments only</h3>
+      <p>All payments go through Stripe PCI-DSS Level 1. Your card data never touches this server — not even for a moment.</p>
+    </div>
+    <div class="trust-card reveal">
+      <div class="trust-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+      <h3>SSL / TLS 1.3</h3>
+      <p>Every byte between you and this site is encrypted with TLS 1.3. HSTS headers ensure your browser always uses HTTPS.</p>
+    </div>
+    <div class="trust-card reveal">
+      <div class="trust-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <h3>Zero data stored</h3>
+      <p>No personal data, no cookies, no trackers. Your purchase information lives in Stripe's encrypted vault — not here.</p>
+    </div>
+    <div class="trust-card reveal">
+      <div class="trust-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <h3>Instant delivery</h3>
+      <p>Your personal download link is generated the moment Stripe confirms payment. No waiting, no account needed.</p>
+    </div>
+    <div class="trust-card reveal">
+      <div class="trust-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.12 0 4.07.74 5.6 1.97"/></svg></div>
+      <h3>Buyer watermark</h3>
+      <p>Every PDF is personalised with your name and a unique purchase ID. Protects your copy and deters resale.</p>
+    </div>
+    <div class="trust-card reveal">
+      <div class="trust-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <h3>DRM-free PDF</h3>
+      <p>No app required. No account to lose access to. Works on Kindle, iPad, phone, laptop. Yours from the moment you download.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <div class="ft-top">
+    <div>
+      <div class="ft-logo">A<span>I</span>RID</div>
+      <p class="ft-tag">Four worlds. Four obsessions. Fiction that doesn't let go. New books coming in 2026 and beyond.</p>
+    </div>
+    <div class="ft-col">
+      <h4>Books</h4>
+      <a href="#" onclick="openModal(0);return false">The Last Frequency</a>
+      <a href="#" onclick="openModal(1);return false">Blood of Forgotten Gods</a>
+      <a href="#" onclick="openModal(2);return false">Kill Switch</a>
+      <a href="#" onclick="openModal(3);return false">The Mirror Protocol</a>
+    </div>
+    <div class="ft-col">
+      <h4>Info</h4>
+      <a href="#about">About Airid</a>
+      <a href="mailto:contact@airid.com">Contact</a>
+      <a href="#trust">Privacy</a>
+      <a href="#trust">Terms of sale</a>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <p>© 2026 Airid. All rights reserved. All books are works of fiction.</p>
+    <div class="ft-badges">
+      <span class="badge">SSL</span>
+      <span class="badge">Stripe</span>
+      <span class="badge">CSP</span>
+      <span class="badge">HSTS</span>
+    </div>
+  </div>
+</footer>
+
+<!-- CHECKOUT MODAL -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Purchase book">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()" aria-label="Close">&times;</button>
+    <h3 id="m-title">Get your book</h3>
+    <div class="modal-row">
+      <div class="modal-thumb"><svg id="m-thumb" viewBox="0 0 46 66"></svg></div>
+      <div class="modal-meta">
+        <h4 id="m-name">—</h4>
+        <p id="m-sub">PDF ebook · by Airid</p>
+        <p class="ok">✓ Instant personalised download</p>
+      </div>
+    </div>
+    <div class="price-row">
+      <span>Total (one-time)</span>
+      <span class="price-val">$6.99</span>
+    </div>
+    <button class="pay-btn" id="pay-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Pay $6.99 securely with Stripe
+    </button>
+    <p class="sec-note">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      256-bit SSL · Stripe PCI-DSS L1 · Card never stored here
+    </p>
+    <div class="setup-box">
+      <strong>⚙ Setup needed:</strong> Open <code>public/index.html</code>, find <code>STRIPE_KEYS</code> near the bottom, replace <code>YOUR_PUBLISHABLE_KEY</code> and the four <code>price_...</code> IDs with your real Stripe credentials. See <code>README.md</code> for the full guide.
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite">✓ Connecting to Stripe…</div>
+
+<script>
+/* ══ STRIPE CONFIG ══════════════════════════════════════════════════
+   Replace YOUR_PUBLISHABLE_KEY with pk_live_xxx
+   Replace each price_... with your real Stripe Price IDs
+   All 4 books can share one publishable key
+   ═══════════════════════════════════════════════════════════════════ */
+var STRIPE_KEYS = [
+  { name:"The Last Frequency \u2014 Tome One",           genre:"Mystery Thriller", color:"#C0392B", pk:"YOUR_PUBLISHABLE_KEY", price:"YOUR_PRICE_ID_BOOK_1" },
+  { name:"The Blood of Forgotten Gods \u2014 Book One",  genre:"Dark Fantasy",     color:"#C9960A", pk:"YOUR_PUBLISHABLE_KEY", price:"YOUR_PRICE_ID_BOOK_2" },
+  { name:"Kill Switch \u2014 Book One",                  genre:"Dark Romance",     color:"#CC2936", pk:"YOUR_PUBLISHABLE_KEY", price:"YOUR_PRICE_ID_BOOK_3" },
+  { name:"The Mirror Protocol \u2014 Book One",          genre:"AI Thriller",      color:"#00A8FF", pk:"YOUR_PUBLISHABLE_KEY", price:"YOUR_PRICE_ID_BOOK_4" },
+];
+
+var THUMBS = [
+  '<rect width="46" height="66" fill="#0D0D1A"/><line x1="23" y1="42" x2="23" y2="18" stroke="#5A5A8C" stroke-width="0.9"/><circle cx="23" cy="43" r="3" fill="#C0392B"/><text x="23" y="11" text-anchor="middle" fill="#F0EDE6" font-family="Georgia,serif" font-size="4" font-weight="bold">THE LAST</text><text x="23" y="16" text-anchor="middle" fill="#F0EDE6" font-family="Georgia,serif" font-size="4" font-weight="bold">FREQUENCY</text><text x="23" y="62" text-anchor="middle" fill="#888" font-family="Helvetica" font-size="3.5" letter-spacing="1">AIRID</text>',
+  '<rect width="46" height="66" fill="#0B0B1F"/><circle cx="23" cy="33" r="15" fill="none" stroke="#C9960A" stroke-width="0.6"/><ellipse cx="23" cy="33" rx="8" ry="4.5" fill="#8B1A1A" stroke="#C9960A" stroke-width="0.5"/><circle cx="23" cy="33" r="2" fill="#0B0B1F"/><circle cx="23" cy="33" r="0.8" fill="#C9960A"/><text x="23" y="10" text-anchor="middle" fill="#EDE8DC" font-family="Georgia,serif" font-size="3.8" font-weight="bold">BLOOD OF</text><text x="23" y="62" text-anchor="middle" fill="#777" font-family="Helvetica" font-size="3.5" letter-spacing="1">AIRID</text>',
+  '<rect width="46" height="66" fill="#0A0A0A"/><line x1="0" y1="23" x2="46" y2="33" stroke="#CC2936" stroke-width="1.5"/><text x="23" y="17" text-anchor="middle" fill="#F4F2EE" font-family="Helvetica" font-size="9" font-weight="bold">KILL</text><text x="23" y="22" text-anchor="middle" fill="#CC2936" font-family="Helvetica" font-size="9" font-weight="bold">SWITCH</text><text x="23" y="62" text-anchor="middle" fill="#666" font-family="Helvetica" font-size="3.5" letter-spacing="1">AIRID</text>',
+  '<rect width="46" height="66" fill="#050810"/><circle cx="23" cy="31" r="16" fill="none" stroke="#00A8FF" stroke-width="0.45"/><line x1="23" y1="15" x2="23" y2="47" stroke="#00A8FF" stroke-width="0.5"/><ellipse cx="15" cy="29" rx="5" ry="3" fill="#0066CC"/><ellipse cx="31" cy="29" rx="5" ry="3" fill="#0066CC"/><circle cx="31" cy="29" r="1.5" fill="#050810"/><circle cx="31" cy="29" r="0.7" fill="#00A8FF"/><text x="23" y="10" text-anchor="middle" fill="#EEF2F7" font-family="Helvetica" font-size="4.5" font-weight="bold">MIRROR</text><text x="23" y="62" text-anchor="middle" fill="#6677AA" font-family="Helvetica" font-size="3.5" letter-spacing="1">AIRID</text>',
+];
+
+var cur = 0;
+
+function openModal(i) {
+  cur = i;
+  var b = STRIPE_KEYS[i];
+  document.getElementById("m-title").textContent = 'Get "' + b.name.split(" \u2014")[0] + '"';
+  document.getElementById("m-name").textContent  = b.name;
+  document.getElementById("m-sub").textContent   = b.genre + " · PDF ebook · by Airid";
+  document.getElementById("m-thumb").innerHTML   = THUMBS[i];
+  var btn = document.getElementById("pay-btn");
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pay $6.99 securely with Stripe';
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  btn.focus();
+}
+
+function closeModal() {
+  document.getElementById("overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("overlay").addEventListener("click", function(e){ if(e.target===this) closeModal(); });
+document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeModal(); });
+
+document.querySelectorAll(".bk-card").forEach(function(c,i){
+  c.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openModal(i); } });
+});
+
+document.getElementById("pay-btn").addEventListener("click", async function() {
+  var b = STRIPE_KEYS[cur];
+  var btn = this;
+  if (b.pk === "YOUR_PUBLISHABLE_KEY") {
+    alert("Demo mode:\n\n1. Open public/index.html\n2. Find STRIPE_KEYS near the bottom\n3. Replace YOUR_PUBLISHABLE_KEY with your Stripe publishable key (pk_live_...)\n4. Replace YOUR_PRICE_ID_BOOK_1 through _4 with your Stripe Price IDs\n\nSee README.md for the full setup guide.");
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = "Connecting to Stripe…";
+  var toast = document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(function(){ toast.classList.remove("show"); }, 3500);
+  try {
+    var stripe = Stripe(b.pk);
+    var r = await stripe.redirectToCheckout({
+      lineItems: [{ price: b.price, quantity: 1 }],
+      mode: "payment",
+      successUrl: window.location.origin + "/api/webhook?session_id={CHECKOUT_SESSION_ID}",
+      cancelUrl:  window.location.href,
+      billingAddressCollection: "auto",
+    });
+    if (r.error) throw new Error(r.error.message);
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pay $6.99 securely with Stripe';
+    toast.classList.remove("show");
+    alert("Payment error: " + err.message);
+  }
+});
+
+/* PARTICLE BG */
+(function(){
+  var c=document.getElementById("hero-canvas"),ctx=c.getContext("2d"),W,H,P=[];
+  function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight}
+  resize(); window.addEventListener("resize",resize);
+  for(var i=0;i<55;i++) P.push({x:Math.random()*1400,y:Math.random()*900,vx:(Math.random()-.5)*.16,vy:(Math.random()-.5)*.16,r:Math.random()*1.1+.3,a:Math.random()*.45+.08});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    P.forEach(function(p){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle="rgba(201,150,10,"+p.a+")"; ctx.fill();
+    });
+    for(var i=0;i<P.length;i++) for(var j=i+1;j<P.length;j++){
+      var dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<115){ctx.beginPath();ctx.moveTo(P[i].x,P[i].y);ctx.lineTo(P[j].x,P[j].y);ctx.strokeStyle="rgba(201,150,10,"+(0.055*(1-d/115))+")";ctx.lineWidth=0.4;ctx.stroke();}
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* SCROLL REVEAL */
+(function(){
+  var els=document.querySelectorAll(".reveal");
+  var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add("visible");obs.unobserve(e.target);}});},{threshold:.1});
+  els.forEach(function(el){obs.observe(el);});
+})();
+</script>
+</body>
+</html>
